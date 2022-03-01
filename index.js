@@ -1,7 +1,7 @@
 const start = () => {
     const WIDTH = 160;
     const HEIGHT = 100;
-    const SCENE = 500;
+    const SCENE = 1500;
 
     const DEG_90 = Math.PI / 2;
     const DEG_360 = Math.PI * 2;
@@ -22,51 +22,8 @@ const start = () => {
     const ctx_1 = canvas_1.getContext('2d');
     setSize(canvas_2);
     const ctx_2 = canvas_2.getContext('2d');
-
-    const alien = [{
-            color: '#0059b3',
-            line: [
-                [-25, -33],
-                [25, -33],
-                [45, -3],
-                [25, 37],
-                [-25, 37],
-                [-45, -3]
-            ]
-        },
-        {
-            color: '#8c1aff',
-            line: [
-                [-25, -23],
-                [-85, 17],
-                [-55, -33]
-            ]
-        },
-        {
-            color: '#8c1aff',
-            line: [
-                [25, -23],
-                [85, 17],
-                [55, -33]
-            ]
-        },
-        {
-            color: '#400',
-            line: [
-                [-30, -13],
-                [-5, 2],
-                [-30, -3]
-            ]
-        },
-        {
-            color: '#400',
-            line: [
-                [30, -13],
-                [5, 2],
-                [30, -3]
-            ]
-        },
-    ]
+    ctx_2.imageSmoothingEnabled = false;
+    // ctx_2.imageSmoothingQuality = 'low';
 
     const animSizeX = WIDTH * .4;
     const animSizeY = HEIGHT * .4;
@@ -74,12 +31,19 @@ const start = () => {
     const halfX = WIDTH / 2;
     const halfY = HEIGHT / 2;
 
-    const minScale = .2;
-    const maxScale = .6;
+    const minScale = .12;
+    const maxScale = .5;
     const maxScale1of2 = maxScale / 2;
 
-    let frame = 0;
-    const serView = (ctx, smooth) => {
+    let frame_1 = 0;
+    let frame_2 = 600;
+    let frame_3 = 1050;
+    const clear = ctx => {
+        ctx.fillStyle = '#000';
+        ctx.fillRect(0, 0, WIDTH, HEIGHT);
+    }
+
+    const serView = (ctx, smooth, data, frame) => {
         const radius = DEG_360 * (frame / SCENE);
         const radius2 = radius * 2;
 
@@ -92,10 +56,10 @@ const start = () => {
         /** graphic functions */
         const getSmooth = num => smooth ? num : Math.round(num);
 
-        const vectorX = () => getSmooth(sinR * animSizeX);
-        const vectorY = () => getSmooth(Math.cos(DEG_90 + (radius2)) * animSizeY);
+        const vectorX = () => (sinR * animSizeX);
+        const vectorY = () => (Math.cos(DEG_90 + (radius2)) * animSizeY);
 
-        const scale = p => getSmooth(p * (((sinR + 1) * maxScale1of2) + minScale));
+        const scale = p => (p * (((sinR + 1) * maxScale1of2) + minScale));
 
         const rotationX = (s1, s2) => getSmooth((cosR2 * s1) - (sinR2 * s2));
         const rotationY = (s1, s2) => getSmooth((cosR2 * s2) + (sinR2 * s1));
@@ -104,17 +68,14 @@ const start = () => {
         const pointY = (r, v) => getSmooth(r + halfY + v);
 
         /** drawing */
-        ctx.fillStyle = '#000';
-        ctx.fillRect(0, 0, WIDTH, HEIGHT);
-
         const vx = vectorX();
         const vy = vectorY();
 
-        for (const a of alien) {
-            ctx.fillStyle = a.color;
+        for (const d of data) {
+            ctx.fillStyle = d.color;
             ctx.beginPath();
-            for (let i = 0; i < a.line.length; i++) {
-                const p = a.line[i];
+            for (let i = 0; i < d.line.length; i++) {
+                const p = d.line[i];
 
                 const sx = scale(p[0]);
                 const sy = scale(p[1]);
@@ -134,10 +95,23 @@ const start = () => {
     }
 
     setInterval(() => {
-        serView(ctx_1, true);
-        serView(ctx_2, false);
-        frame++;
-        if (frame > SCENE) frame = 0
+        clear(ctx_1);
+        clear(ctx_2);
+
+        serView(ctx_1, true, alien_1, frame_1);
+        serView(ctx_2, false, alien_1, frame_1);
+        frame_1++;
+        if (frame_1 > SCENE) frame_1 = 0
+
+        serView(ctx_1, true, alien_2, frame_2);
+        serView(ctx_2, false, alien_2, frame_2);
+        frame_2++;
+        if (frame_2 > SCENE) frame_2 = 0
+
+        serView(ctx_1, true, alien_3, frame_3);
+        serView(ctx_2, false, alien_3, frame_3);
+        frame_3++;
+        if (frame_3 > SCENE) frame_3 = 0
     }, 16);
 }
 
