@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="pl-PL">
+
+<head>
+    <style>
+        body {
+            margin: 10px;
+            padding: 0;
+            background-color: #111;
+            color: #333;
+            font-family: 'Consolas', sans-serif;
+            font-size: 30px;
+        }
+        
+        .all {
+            display: flex;
+            flex-direction: row;
+        }
+        
+        .wrap {
+            width: calc(50% - 5px);
+        }
+        
+        .wrap:nth-child(2) {
+            margin-left: 10px;
+        }
+        
+        .pixeled {
+            image-rendering: -moz-crisp-edges;
+            image-rendering: -webkit-crisp-edges;
+            image-rendering: pixelated;
+            image-rendering: crisp-edges;
+        }
+    </style>
+    <meta http-equiv="Content-Type" content="text/html;  charset=utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Space Invaders</title>
+</head>
+
+<body>
+    <div class="all">
+        <div class="wrap">
+            <div>typical</div>
+            <canvas id="canvas-1"></canvas>
+        </div>
+        <div class="wrap pixeled">
+            <div>pixelated</div>
+            <canvas id="canvas-2"></canvas>
+        </div>
+    </div>
+
+    <script>
+        const start = () => {
+            const WIDTH = 100;
+            const HEIGHT = 80;
+            const SCENE = 1000;
+
+            const canvas_1 = document.getElementById('canvas-1');
+            const canvas_2 = document.getElementById('canvas-2');
+
+            const setSize = (canvas) => {
+                canvas.width = WIDTH;
+                canvas.height = HEIGHT;
+
+                let wrap = canvas.parentElement;
+                let wrapRec = wrap.getBoundingClientRect();
+                canvas.style.width = wrapRec.width + 'px';
+            }
+
+            setSize(canvas_1);
+            const ctx_1 = canvas_1.getContext('2d');
+            setSize(canvas_2);
+            const ctx_2 = canvas_2.getContext('2d');
+
+            const alien = [{
+                color: '#0059b3',
+                line: [
+                    [-25, -33],
+                    [25, -33],
+                    [45, -3],
+                    [25, 37],
+                    [-25, 37],
+                    [-45, -3]
+                ]
+            }, {
+                color: '#8c1aff',
+                line: [
+                    [-25, -23],
+                    [-85, 17],
+                    [-55, -33]
+                ]
+            }, {
+                color: '#8c1aff',
+                line: [
+                    [25, -23],
+                    [85, 17],
+                    [55, -33]
+                ]
+            }, {
+                color: '#400',
+                line: [
+                    [-30, -13],
+                    [-5, 2],
+                    [-30, -3]
+                ]
+            }, {
+                color: '#400',
+                line: [
+                    [30, -13],
+                    [5, 2],
+                    [30, -3]
+                ]
+            }, ]
+
+            let frame = 0;
+            const serView = ctx => {
+                ctx.fillStyle = '#000';
+                ctx.fillRect(0, 0, WIDTH, HEIGHT);
+
+                for (const a of alien) {
+                    ctx.fillStyle = a.color;
+                    ctx.beginPath();
+                    for (let i = 0; i < a.line.length; i++) {
+                        const p = a.line[i];
+
+                        const v1 = Math.sin(Math.PI * 2 * (frame / SCENE)) * WIDTH * .4;
+                        const v2 = Math.cos((Math.PI / 2) + (Math.PI * 4 * (frame / SCENE))) * HEIGHT * .4;
+
+                        const s1 = p[0] * (((Math.sin(Math.PI * 2 * (frame / SCENE)) + 1) * .3) + .2)
+                        const s2 = p[1] * (((Math.sin(Math.PI * 2 * (frame / SCENE)) + 1) * .3) + .2)
+
+                        const rotationX = () => {
+                            if (frame < SCENE / 2) {
+                                return (Math.cos(Math.PI * 4 * (frame / SCENE)) * s1) - (Math.sin(Math.PI * 4 * (frame / SCENE)) * s2)
+                            }
+                            return (Math.cos(-Math.PI * 4 * (frame / SCENE)) * s1) - (-Math.sin(Math.PI * 4 * (frame / SCENE)) * s2)
+                        }
+
+                        const rotationY = () => {
+                            if (frame < SCENE / 2) {
+                                return (Math.cos(Math.PI * 4 * (frame / SCENE)) * s2) + (Math.sin(Math.PI * 4 * (frame / SCENE)) * s1);
+                            }
+                            return (Math.cos(-Math.PI * 4 * (frame / SCENE)) * s2) + (-Math.sin(Math.PI * 4 * (frame / SCENE)) * s1);
+                        }
+
+                        const r1 = rotationX();
+                        const r2 = rotationY();
+
+                        const p1 = r1 + (WIDTH / 2) + v1;
+                        const p2 = r2 + (HEIGHT / 2) + v2;
+
+                        if (i == 0) {
+                            ctx.moveTo(p1, p2);
+                            continue
+                        };
+                        ctx.lineTo(p1, p2);
+                    }
+                    ctx.closePath();
+                    ctx.fill();
+                }
+            }
+
+            setInterval(() => {
+                serView(ctx_1);
+                serView(ctx_2);
+                frame++;
+                if (frame > SCENE) frame = 0
+            }, 16);
+        }
+
+        start();
+    </script>
+</body>
+
+</html>

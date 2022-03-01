@@ -1,0 +1,28 @@
+body {
+    margin: 10px;
+    padding: 0;
+    background-color: #111;
+    color: #333;
+    font-family: 'Consolas', sans-serif;
+    font-size: 30px;
+}
+
+.all {
+    display: flex;
+    flex-direction: row;
+}
+
+.wrap {
+    width: calc(50% - 5px);
+}
+
+.wrap:nth-child(2) {
+    margin-left: 10px;
+}
+
+.pixeled {
+    image-rendering: -moz-crisp-edges;
+    image-rendering: -webkit-crisp-edges;
+    image-rendering: pixelated;
+    image-rendering: crisp-edges;
+}
